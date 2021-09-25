@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="main.css"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+	<h1>Wifi Stop Light</h1>
+	<ul>
+		<li id="auto">Automatic: <span><input class="auto" type="radio" name="state" onchange="toggle(this)" value="auto"></span></li>
+		<li id="red">Red: 
+			<span>
+				<input type="radio" name="state" onchange="toggle(this)" value="red">
+			</span>
+		</li>
+		<li id="yellow">Yellow: 
+			<span>
+				<input type="radio" name="state" onchange="toggle(this)" value="yellow">
+			</span>
+		</li>
+		<li id="green">Green: 
+			<span>
+				<input type="radio" name="state" onchange="toggle(this)" value="green">
+			</span>
+		</li>
+		<li id="off">Turn off: 
+			<span>
+				<input class="off" type="radio" name="state" onchange="toggle(this)" value="off">
+			</span>
+		</li>
+	</ul>
+	<script src="index.js"></script>
+</body>
+</html>
