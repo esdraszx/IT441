@@ -5,8 +5,7 @@ const char* wifiSSID = "eesc"; // In order for this to work, you MUST specify th
 const char* wifiPSK = "password"; // And the preshared key (wifi password)
 
 const char* mqttServer = "192.168.137.115";
-const char* ultrasonicSensorTopic = "/lab4/sonic";
-const char* lightsTopic = "/lab4/lights";
+const char* ultrasonicSensorTopic = "homeassistant/sensor/distance";
 String host = "lights";
 
 int red = D1;
@@ -82,34 +81,29 @@ void lightOn(String light){
       digitalWrite(red, HIGH);
       digitalWrite(green, LOW);
       digitalWrite(yellow, LOW);
-      mqttClient.publish(lightsTopic, "red");
-  }
+ }
   else if(light == "green"){
     Serial.println("GREEN ON");
     digitalWrite(red, LOW);
     digitalWrite(green, HIGH);
     digitalWrite(yellow, LOW);
-    mqttClient.publish(lightsTopic, "green");
   } 
   else if(light == "yellow"){
     Serial.println("YELLOW ON");
     digitalWrite(red, LOW);
     digitalWrite(green, LOW);
     digitalWrite(yellow, HIGH);
-    mqttClient.publish(lightsTopic, "yellow");
   }
   else if(light == "all"){
     Serial.println("ALL ON");
     digitalWrite(red, HIGH);
     digitalWrite(green, HIGH);
     digitalWrite(yellow, HIGH);
-    mqttClient.publish(lightsTopic, "all");
   }
   else {
     Serial.println("OFF");
     digitalWrite(red, LOW);
     digitalWrite(green, LOW);
     digitalWrite(yellow, LOW);
-    mqttClient.publish(lightsTopic, "off");
   }
 }

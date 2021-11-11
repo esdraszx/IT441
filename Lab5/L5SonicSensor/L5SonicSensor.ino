@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+#include <Arduino_JSON.h>
 
 const char* wifiSSID = "eesc"; // In order for this to work, you MUST specify the SSID for your wifi
 const char* wifiPSK = "password"; // And the preshared key (wifi password)
@@ -20,8 +21,8 @@ int distance = 0;
 boolean isDoorOpen = false;
 
 const char* mqttServer = "192.168.137.115";
-const char* doorTopic = "/lab4/door";
-const char* lightsTopic = "/lab4/sonic";
+String doorTopic = "homeassistant/switch/garage_door";
+String distanceTopic = "homeassistant/sensor/distance";
 String host = "ultrasonic";
 
 WiFiClient wifiClient;
@@ -30,36 +31,45 @@ PubSubClient mqttClient(wifiClient);
 //REFERENCES
 
 void setup() { 
- Serial.begin(115200); // Open a serial connection (for debugging)
- delay(10); 
- pinMode(echo, INPUT);
- pinMode(trig, OUTPUT);
- pinMode(sound, OUTPUT);
- digitalWrite(sound, LOW);
-
- // ** Connect to WiFi network - Adapted from http://www.esp8266learning.com/wemos-webserver-example.php
- Serial.print("Connecting to "); // Display debugging connection info
- Serial.println(wifiSSID); // Print the configured SSID to the Serial Monitor
- WiFi.begin(wifiSSID, wifiPSK); // Use the provided SSID and PSK to connect
- 
- while (WiFi.status() != WL_CONNECTED) { // If not connected to wifi
+  Serial.begin(115200); // Open a serial connection (for debugging)
+  delay(10); 
+  pinMode(echo, INPUT);
+  pinMode(trig, OUTPUT);
+  pinMode(sound, OUTPUT);
+  digitalWrite(sound, LOW);
+  
+  // ** Connect to WiFi network - Adapted from http://www.esp8266learning.com/wemos-webserver-example.php
+  Serial.print("Connecting to "); // Display debugging connection info
+  Serial.println(wifiSSID); // Print the configured SSID to the Serial Monitor
+  WiFi.begin(wifiSSID, wifiPSK); // Use the provided SSID and PSK to connect
+  
+  while (WiFi.status() != WL_CONNECTED) { // If not connected to wifi
    delay(500); // Pause
    Serial.print("."); // Print a dot each loop while trying to connect
- }
- 
- Serial.println("");
- Serial.println("WiFi connected"); // Print "connected" message to the Serial Monitor
-
- 
- //connecting to a mqtt broker
- Serial.println("Connecting to MQTT");
- mqttClient.setServer(mqttServer, 1883);
- mqttClient.setCallback(callback);
- while (!mqttClient.connected()) {     // Function to call when new messages are received
+  }
+  
+  Serial.println("");
+  Serial.println("WiFi connected"); // Print "connected" message to the Serial Monitor
+  
+  
+  //connecting to a mqtt broker
+  Serial.println("Connecting to MQTT");
+  mqttClient.setServer(mqttServer, 1883);
+  mqttClient.setCallback(callback);
+  while (!mqttClient.connected()) {     // Function to call when new messages are received
   mqttClient.connect(host.c_str());     // Connect to the broker with unique hostname
   Serial.println(mqttClient.state());   // Show debug info about MQTT state
- }
- mqttClient.subscribe(doorTopic);
+  }
+  mqttClient.subscribe(doorTopic.c_str());
+
+  JSONVar json;
+  
+  json["name"] = "sonic";
+  json["unique_id"] = "sonic";
+  json["state_topic"] = distanceTopic;
+  
+  mqttClient.publish((distanceTopic + "/config").c_str(), JSON.stringify(json).c_str());
+  Serial.println("finished setup");
 }
 void loop() {
 
@@ -90,7 +100,7 @@ void loop() {
     checkDistance();
   }
 
-  mqttClient.publish(lightsTopic, lightState);
+  mqttClient.publish(distanceTopic.c_str(), lightState);
     
   delay(1000);
 }
